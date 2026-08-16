@@ -1,0 +1,23 @@
+[
+  {
+    "id": "Task_A",
+    "command": "echo 'Running A'",
+    "dependencies": [],
+    "cpu_cost": 20,
+    "mem_cost": 512
+  },
+  {
+    "id": "Task_B",
+    "command": "echo 'Running B'",
+    "dependencies": [],
+    "cpu_cost": 10,
+    "mem_cost": 256
+  },
+  {
+    "id": "Task_C",
+    "command": "echo 'Running C (Needs A and B)'",
+    "dependencies": ["Task_A", "Task_B"],
+    "cpu_cost": 50,
+    "mem_cost": 1024
+  }
+]
