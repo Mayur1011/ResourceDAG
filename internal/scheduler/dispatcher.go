@@ -83,6 +83,7 @@ func (d *Dispatcher) Run(ctx context.Context) {
 
 		select {
 		case activeTaskChan <- candidate:
+			candidate.State = dag.StateRunning
 			d.resMgr.TryAcquire(candidate.CPUCost, candidate.MemCost)
 			candidate.State = dag.StateRunning
 			heap.Remove(&pq, candidateIdx)

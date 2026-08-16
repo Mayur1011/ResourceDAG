@@ -35,7 +35,6 @@ func Replay(filename string, graph *dag.DAG) (int, error) {
 			task.State = state
 			recoveredCount++
 
-			// Unblock downstream dependencies
 			for _, childID := range graph.AdjacencyList[taskID] {
 				graph.InDegree[childID]--
 			}
