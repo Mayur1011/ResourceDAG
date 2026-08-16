@@ -122,13 +122,11 @@ func (d *Dispatcher) skipChildren(failedTaskID string) {
 
 		childTask := d.graph.Tasks[currID]
 
-		// Ensure we don't double-count if multiple paths lead to the same skipped child
 		if childTask.State != dag.StateSkipped {
 			fmt.Printf("⏭️  Skipping %s due to upstream failure.\n", currID)
 			childTask.State = dag.StateSkipped
 			d.processedCount++
 
-			// Enqueue this skipped task's children to continue the cascade
 			queue = append(queue, d.graph.AdjacencyList[currID]...)
 		}
 	}

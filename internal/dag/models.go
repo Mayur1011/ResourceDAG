@@ -2,7 +2,6 @@ package dag
 
 import "time"
 
-// TaskState represents the current lifecycle phase of a task.
 type TaskState string
 
 const (
@@ -14,8 +13,6 @@ const (
 	StateSkipped   TaskState = "SKIPPED"   // Cancelled because a parent failed
 )
 
-// Task represents a single unit of work in the DAG.
-// internal/dag/models.go
 
 type Task struct {
 	ID           string   `json:"id"`
@@ -26,10 +23,9 @@ type Task struct {
 
 	State        TaskState `json:"-"`
 	CriticalPath int       `json:"-"`
-	EnqueuedAt   time.Time `json:"-"` // NEW: Tracks queue entry time
+	EnqueuedAt   time.Time `json:"-"`
 }
 
-// DAG represents the entire executable graph.
 type DAG struct {
 	Tasks         map[string]*Task    // Quick lookup of tasks by ID
 	AdjacencyList map[string][]string // Maps a Parent ID -> List of Child IDs

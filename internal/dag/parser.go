@@ -14,7 +14,6 @@ func ParseJSON(payload []byte) (*DAG, error) {
 
 	graph := NewDAG()
 
-	// 1st Pass: Register all tasks and initialize their In-Degrees
 	for i := range taskList {
 		task := &taskList[i]
 		task.State = StatePending // Default state
@@ -27,7 +26,6 @@ func ParseJSON(payload []byte) (*DAG, error) {
 		graph.InDegree[task.ID] = len(task.Dependencies)
 	}
 
-	// 2nd Pass: Build the Adjacency List and validate dependencies
 	for _, task := range graph.Tasks {
 		for _, depID := range task.Dependencies {
 			// Validate that the parent dependency actually exists in our graph
@@ -35,8 +33,6 @@ func ParseJSON(payload []byte) (*DAG, error) {
 				return nil, fmt.Errorf("task %s depends on unknown task %s", task.ID, depID)
 			}
 
-			// Add the current task as a child of its dependency
-			// (Parent -> Child relationship)
 			graph.AdjacencyList[depID] = append(graph.AdjacencyList[depID], task.ID)
 		}
 	}
