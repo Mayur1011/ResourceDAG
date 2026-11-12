@@ -27,6 +27,7 @@ type Task struct {
 }
 
 type DAG struct {
+	ID            string              `json:"id"`
 	Tasks         map[string]*Task    // Quick lookup of tasks by ID
 	AdjacencyList map[string][]string // Maps a Parent ID -> List of Child IDs
 	InDegree      map[string]int      // Tracks how many uncompleted parents a task has
@@ -35,6 +36,7 @@ type DAG struct {
 // NewDAG initializes an empty DAG structure.
 func NewDAG() *DAG {
 	return &DAG{
+		ID:            "",
 		Tasks:         make(map[string]*Task),
 		AdjacencyList: make(map[string][]string),
 		InDegree:      make(map[string]int),

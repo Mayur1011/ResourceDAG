@@ -41,7 +41,7 @@ func executeTask(workerID int, task *dag.Task, resultsChan chan<- Result) {
 		}
 	}()
 
-	fmt.Printf("👷 Worker %d starting task: %s\n", workerID, task.ID)
+	fmt.Printf("Worker %d starting task: %s\n", workerID, task.ID)
 
 	if task.Command == "panic" {
 		panic("simulated catastrophic crash")
@@ -49,7 +49,7 @@ func executeTask(workerID int, task *dag.Task, resultsChan chan<- Result) {
 		err = fmt.Errorf("simulated standard error")
 	} else {
 		time.Sleep(500 * time.Millisecond)
-		fmt.Printf("✅ Worker %d finished task: %s\n", workerID, task.ID)
+		fmt.Printf("Worker %d finished task: %s\n", workerID, task.ID)
 	}
 
 	resultsChan <- Result{TaskID: task.ID, Err: err}

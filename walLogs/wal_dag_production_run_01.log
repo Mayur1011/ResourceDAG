@@ -1,0 +1,6 @@
+{"timestamp":"2026-08-16T22:07:53.862789193+05:30","dag_id":"dag_production_run_01","task_id":"Task_A","state":"RUNNING"}
+{"timestamp":"2026-08-16T22:07:53.871215264+05:30","dag_id":"dag_production_run_01","task_id":"Task_B","state":"RUNNING"}
+{"timestamp":"2026-08-16T22:07:54.363505739+05:30","dag_id":"dag_production_run_01","task_id":"Task_A","state":"COMPLETED"}
+{"timestamp":"2026-08-16T22:07:54.385133607+05:30","dag_id":"dag_production_run_01","task_id":"Task_B","state":"COMPLETED"}
+{"timestamp":"2026-08-16T22:07:54.394334695+05:30","dag_id":"dag_production_run_01","task_id":"Task_C","state":"RUNNING"}
+{"timestamp":"2026-08-16T22:07:54.895044127+05:30","dag_id":"dag_production_run_01","task_id":"Task_C","state":"COMPLETED"}

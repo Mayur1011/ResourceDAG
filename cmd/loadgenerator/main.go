@@ -19,7 +19,7 @@ func main() {
 	deepTasks := generateDeepDAG(50)
 	saveToFile(deepTasks, "examples/bench_deep.json")
 
-	fmt.Println("✅ Benchmark DAGs generated successfully in examples/ directory.")
+	fmt.Println("Benchmark DAGs generated successfully in examples/ directory.")
 }
 
 func generateWideDAG(count int) []dag.Task {

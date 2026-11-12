@@ -8,6 +8,7 @@ import (
 
 	"github.com/mayur/scheduler/internal/dag"
 	"github.com/mayur/scheduler/internal/resource"
+	"github.com/mayur/scheduler/internal/wal"
 	"github.com/mayur/scheduler/internal/worker"
 )
 
@@ -15,16 +16,18 @@ type Dispatcher struct {
 	graph               *dag.DAG
 	workerCount         int
 	resMgr              resource.Manager
+	walLog              *wal.Logger
 	policy              Policy
 	processedCount      int
 	starvationThreshold time.Duration // NEW
 }
 
-func NewDispatcher(graph *dag.DAG, workerCount int, resMgr resource.Manager, policy Policy) *Dispatcher {
+func NewDispatcher(graph *dag.DAG, workerCount int, resMgr resource.Manager, walLog *wal.Logger, policy Policy) *Dispatcher {
 	return &Dispatcher{
 		graph:               graph,
 		workerCount:         workerCount,
 		resMgr:              resMgr,
+		walLog:              walLog,
 		policy:              policy,
 		starvationThreshold: 2 * time.Second, // After 2 seconds, trigger anti-starvation
 	}
@@ -64,7 +67,7 @@ func (d *Dispatcher) Run(ctx context.Context) {
 					candidate = headItem.Task
 					candidateIdx = 0
 				} else {
-					fmt.Printf("⚠️  [Starvation Mode] Halting backfill. Waiting on resources for %s\n", headItem.Task.ID)
+					fmt.Printf("Waiting on resources for %s\n", headItem.Task.ID)
 				}
 			} else {
 				for i, item := range pq {
@@ -84,6 +87,7 @@ func (d *Dispatcher) Run(ctx context.Context) {
 		select {
 		case activeTaskChan <- candidate:
 			candidate.State = dag.StateRunning
+			d.walLog.Append(candidate.ID, dag.StateRunning)
 			d.resMgr.TryAcquire(candidate.CPUCost, candidate.MemCost)
 			candidate.State = dag.StateRunning
 			heap.Remove(&pq, candidateIdx)
@@ -95,9 +99,11 @@ func (d *Dispatcher) Run(ctx context.Context) {
 
 			if result.Err != nil {
 				task.State = dag.StateFailed
+				d.walLog.Append(task.ID, dag.StateFailed)
 				d.skipChildren(task.ID)
 			} else {
 				task.State = dag.StateCompleted
+				d.walLog.Append(task.ID, dag.StateCompleted)
 				for _, childID := range d.graph.AdjacencyList[result.TaskID] {
 					d.graph.InDegree[childID]--
 					if d.graph.InDegree[childID] == 0 && d.graph.Tasks[childID].State != dag.StateSkipped {
@@ -110,7 +116,7 @@ func (d *Dispatcher) Run(ctx context.Context) {
 	}
 
 	close(tasksChan)
-	fmt.Println("🎉 Engine shutdown. Queue processed successfully.")
+	fmt.Println("Engine shutdown. Queue processed successfully.")
 }
 
 func (d *Dispatcher) skipChildren(failedTaskID string) {
@@ -124,7 +130,7 @@ func (d *Dispatcher) skipChildren(failedTaskID string) {
 		childTask := d.graph.Tasks[currID]
 
 		if childTask.State != dag.StateSkipped {
-			fmt.Printf("⏭️  Skipping %s due to upstream failure.\n", currID)
+			fmt.Printf("Skipping %s due to upstream failure.\n", currID)
 			childTask.State = dag.StateSkipped
 			d.processedCount++
 

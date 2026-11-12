@@ -16,7 +16,7 @@ import (
 
 func main() {
 	resMgr := resource.NewMutexManager(100, 1024)
-	srv := api.NewServer(":6969", resMgr)
+	srv := api.NewServer(":6969", resMgr, nil)
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	go func() {
